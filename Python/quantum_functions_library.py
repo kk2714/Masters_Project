@@ -9,11 +9,8 @@ inidividual scripts for clean scripting.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
-import numba
 from math import factorial
 from scipy.stats import norm
-import time as time_clock
 from numpy.polynomial.hermite import *
 from scipy.integrate import quad
 import math
@@ -87,7 +84,7 @@ def init_coherent_state(dim, p_init, q_init, mass, omega, hbar):
     return(wavefunction)
     
 # Define a function to compute the expectation of an operator
-@numba.jit
+
 def expectation(operator, wavefunction):
     '''Function takes an operator and wavefunction and returns the expectation value.
       Arguments:
@@ -252,7 +249,7 @@ def grid_projectors(xmin, xmax, no_of_points, dim, mass, omega, hbar):
         mid_points.append((x_grid[k] + x_grid[k+1])/2)
     return operators, mid_points
 
-@numba.jit
+
 def drift_coeff(wavefunction, hamiltonian, lindblad, hbar):
     ''' Function returns the drift term needed for evaluation of stochastic
     Schrodinger equation in numerical schemes.
@@ -267,7 +264,7 @@ def drift_coeff(wavefunction, hamiltonian, lindblad, hbar):
             1/2 * lindblad.getH() * lindblad * wavefunction - 1/2 * expectation(lindblad.getH(), wavefunction) * expectation(lindblad, wavefunction) * wavefunction
     return(drift)
 
-@numba.jit
+
 def diffusion_term(wavefunction, hamiltonian, lindblad, hbar):
     '''Function returns the diffusion term needed for evaluation of stochastic
     Schrodinger equation in numerical schemes.
@@ -284,7 +281,7 @@ def diffusion_term(wavefunction, hamiltonian, lindblad, hbar):
 # Implementing Euler scheme. Section 7.2.2 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
 
-@numba.jit
+
 def simulate_sse_euler(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps):
     '''Arguments:
         init_state - N matrix defining initial state. Initial state will be propagated in time
@@ -312,7 +309,7 @@ def simulate_sse_euler(init_state, hamiltonian, lindblad, hbar, time_step, no_ti
 # Implementing Heun scheme. Section 7.2.3 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
     
-@numba.jit
+
 def simulate_sse_heun(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps):
     '''Arguments:
         init_state - N matrix defining initial state. Initial state will be propagated in time
@@ -350,7 +347,7 @@ def simulate_sse_heun(init_state, hamiltonian, lindblad, hbar, time_step, no_tim
 # Implementing Runge-Kutta scheme. Section 7.2.4 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
     
-@numba.jit
+
 def simulate_sse_rk(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps):
     '''Arguments:
         init_state - N matrix defining initial state. Initial state will be propagated in time
@@ -394,7 +391,7 @@ def simulate_sse_rk(init_state, hamiltonian, lindblad, hbar, time_step, no_time_
 # Implementing Platen scheme. Section 7.2.5 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
     
-@numba.jit
+
 def simulate_sse_platen(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps):
     '''Arguments:
         init_state - N matrix defining initial state. Initial state will be propagated in time
@@ -444,7 +441,6 @@ def simulate_sse_platen(init_state, hamiltonian, lindblad, hbar, time_step, no_t
     return(wave_evol)
 
 # Define a function to compute an operator time-average with standard error
-@numba.jit(parallel=True)
 def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, time_step, no_time_steps, no_of_realisations, method):
     '''Function computes the time evolution of an operator by averaging over a given number of
     realisations of individual solutions of the stochastic Schrodinger equation with a specified
@@ -512,7 +508,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
 
 ### Convergence function requires more work and bullet proofing. Unclear as to
 ### which eigenstate convergence to choose. FIX ME.
-@numba.jit
+
 def convergence_function(V1, V2, hbar, T, mass, omega, time_step):
     ''' The Hamiltonian is of the form: 0.5 p^2/m - v1 q^2 + v2 q^4. The initial state is a coherent
     state dependepent on the temperature, T. This function computes the optimal dimension for modelling the 
@@ -612,7 +608,7 @@ def convergence_function(V1, V2, hbar, T, mass, omega, time_step):
     return(dim, omega, dim_array, error_time_iter_array, eigval_of_int_array, prob_array)
 
 # Defining Lindblad drift based on Liouville equation
-@numba.jit
+
 def lindblad_drift(rho, hamiltonian, lindblad, hbar):
     '''Arguments:
         rho - NxN matrix defining the current rho state. 
@@ -627,7 +623,7 @@ def lindblad_drift(rho, hamiltonian, lindblad, hbar):
     return(drift)
 
 ### Integrating Lindblad directly
-@numba.jit
+
 def int_lindblad_liouv_euler(init_state, hamiltonian, lindblad, hbar, time_step, no_steps):
     '''Arguments:
         init_state - N matrix defining initial state.
@@ -648,7 +644,7 @@ def int_lindblad_liouv_euler(init_state, hamiltonian, lindblad, hbar, time_step,
     return(rho_evol)
 
 ### Obtaining the expectation value of operator in time by using Euler scheme to integrate Lindblad equation
-@numba.jit
+
 def tr_rho_operator_euler(init_rho, operator, hamiltonian, lindblad, hbar, time_step, no_steps):
     '''Arguments:
         init_rho - NxN matrix defining initial state.
@@ -675,7 +671,7 @@ def tr_rho_operator_euler(init_rho, operator, hamiltonian, lindblad, hbar, time_
             break
     return(tr_rho_operator)
 
-@numba.jit
+
 def exp_op_lindblad_superoperator(init_rho, operator, hamiltonian, lindblad, hbar, time_step, no_steps):
     '''Arguments:
         init_rho - NxN matrix defining initial state.
@@ -706,7 +702,7 @@ def exp_op_lindblad_superoperator(init_rho, operator, hamiltonian, lindblad, hba
             break
     return(tr_rho_operator)
 
-@numba.jit
+
 def rho_lindblad_superoperator(init_rho, hamiltonian, lindblad, hbar, time_step, no_steps):
     '''Arguments:
         init_rho - NxN matrix defining initial state.
@@ -738,7 +734,7 @@ def rho_lindblad_superoperator(init_rho, hamiltonian, lindblad, hbar, time_step,
 
 #### Obtaining the expectation value of operator in time by using RK scheme to integrate Lindblad equation
 ##### DOES NOT WORK!
-#@numba.jit
+#
 #def tr_rho_operator_rk(init_rho, operator, hamiltonian, lindblad, hbar, time_step, no_steps):
 #    '''Arguments:
 #        init_rho - NxN matrix defining initial state.
