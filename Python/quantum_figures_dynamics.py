@@ -36,7 +36,7 @@ dim = 60
 percentile = np.random.rand()
 p_init = 0.00 #norminv(percentile, 0, np.sqrt(T))
 q_init = 1
-init_wave = init_coherent_state(dim, p_init, q_init, mass, omega)
+init_wave = init_coherent_state(dim, p_init, q_init, mass, omega, hbar)
 
 # Defining operators
 x_operator = np.sqrt(hbar / (2 * mass * omega)) * (raising_operator(dim) + lowering_operator(dim)) 
@@ -76,7 +76,7 @@ dim = 50
 percentile = np.random.rand()
 p_init = 0.1 #norminv(percentile, 0, np.sqrt(T))
 q_init = 1
-init_wave = init_coherent_state(dim, p_init, q_init, mass, omega)
+init_wave = init_coherent_state(dim, p_init, q_init, mass, omega, hbar)
 
 # Defining operators
 x_operator = np.sqrt(hbar / (2 * mass * omega)) * (raising_operator(dim) + lowering_operator(dim)) 

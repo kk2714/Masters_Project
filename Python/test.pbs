@@ -1,0 +1,7 @@
+#!/bin/bash
+#PBS -N python_test_job
+#PBS -m be
+#PBS -q standard
+
+cd /home/ma/k/kk2714/Masters_Project/Python
+python cluster_test.py > results.out
