@@ -161,7 +161,7 @@ omega = 1
 #    
 #print(prob_total)
 
-### Plot the V(q)
+### Plot the V(q) - hey
 x = np.arange(-1.5, 1.5, 0.001)
 v_x = -1.5 * x ** 2 + 0.75 * x ** 4
 plt.figure()
