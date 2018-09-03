@@ -20,7 +20,7 @@ hbar = 1/(8.575*10 **(-34)/ (1.0545718 * 10**(-34)))
 kb = 1
 omega = 1
 time_step = 0.001
-no_time_steps = 500000
+no_time_steps = 50
 dim = 80
 
 # Initial conditions
@@ -32,15 +32,9 @@ init_state = init_coherent_state(dim, p_init, q_init, mass, omega, hbar)
 # Defining operators
 x_operator = np.sqrt(hbar / (2 * mass * omega)) * (raising_operator(dim) + lowering_operator(dim)) 
 p_operator = 1j * np.sqrt(hbar * mass * omega / 2) * (raising_operator(dim) - lowering_operator(dim)) 
-
-# NO TEMPERATURE REGIME
 lindblad = 0 * np.sqrt(2 * mass * kb * T) / hbar * x_operator + 0 * 1j / (2 * np.sqrt(2 * mass * kb * T)) * p_operator
 h_sys = 1/(2 * mass) * p_operator * p_operator + V2 * x_operator * x_operator * x_operator * x_operator - V1 * x_operator * x_operator
-
 hamiltonian = h_sys + gamma/2 * (x_operator * p_operator + p_operator * x_operator)
-
-#unseeding code in a cheeky way
-np.random.seed(int(time_clock.time()))
 results = operator_time_average(init_state, hamiltonian, lindblad, x_operator, hbar, time_step, no_time_steps, 1, "rk")
 
 init_state_str = 'hey'
