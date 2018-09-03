@@ -46,7 +46,7 @@ def lowering_operator(dim):
     for i in range(dim - 1):
         A[i, i + 1] = np.sqrt(i + 1)
     A[dim - 1, dim - 1] = 1.0
-    return(A)
+    return A
         
 # Define raising operator
 def raising_operator(dim):
@@ -58,7 +58,7 @@ def raising_operator(dim):
     A = np.matrix([[0 for x in range(dim)] for y in range(dim)], dtype = complex)
     for i in range(1, dim):
         A[i, i - 1] = np.sqrt(i)
-    return(A)
+    return A 
 
 # Defining initial coherent state
 def init_coherent_state(dim, p_init, q_init, mass, omega, hbar):
@@ -81,7 +81,7 @@ def init_coherent_state(dim, p_init, q_init, mass, omega, hbar):
     
     # Renormalise to account for lack of higher order states
     wavefunction = wavefunction/np.linalg.norm(wavefunction)
-    return(wavefunction)
+    return wavefunction 
     
 # Define a function to compute the expectation of an operator
 
@@ -262,7 +262,7 @@ def drift_coeff(wavefunction, hamiltonian, lindblad, hbar):
         The drift term needed for stochastic Schrodinger equation in numerical schemes.'''
     drift = -1j/hbar * hamiltonian * wavefunction + expectation(lindblad.getH(), wavefunction) * lindblad * wavefunction - \
             1/2 * lindblad.getH() * lindblad * wavefunction - 1/2 * expectation(lindblad.getH(), wavefunction) * expectation(lindblad, wavefunction) * wavefunction
-    return(drift)
+    return drift
 
 
 def diffusion_term(wavefunction, hamiltonian, lindblad, hbar):
@@ -276,7 +276,7 @@ def diffusion_term(wavefunction, hamiltonian, lindblad, hbar):
       Returns:
         The diffusion term needed for stochastic Schrodinger equation in numerical schemes.'''
     diffusion = lindblad * wavefunction - expectation(lindblad, wavefunction) * wavefunction
-    return(diffusion)
+    return diffusion
 
 # Implementing Euler scheme. Section 7.2.2 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
@@ -304,7 +304,7 @@ def simulate_sse_euler(init_state, hamiltonian, lindblad, hbar, time_step, no_ti
         wave_after = np.asarray(wave_after).reshape(-1)
         wave_evol[:, k] = wave_after/np.linalg.norm(wave_after)
         k += 1
-    return(wave_evol)
+    return wave_evol
 
 # Implementing Heun scheme. Section 7.2.3 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
@@ -342,7 +342,7 @@ def simulate_sse_heun(init_state, hamiltonian, lindblad, hbar, time_step, no_tim
         wave_step_after = np.asarray(wave_step_after).reshape(-1)
         wave_evol[:, k] = wave_step_after/np.linalg.norm(wave_step_after)
         k += 1
-    return(wave_evol)
+    return wave_evol
 
 # Implementing Runge-Kutta scheme. Section 7.2.4 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
@@ -386,7 +386,7 @@ def simulate_sse_rk(init_state, hamiltonian, lindblad, hbar, time_step, no_time_
         wave_step_after = np.asarray(wave_step_after).reshape(-1)
         wave_evol[:, k] = wave_step_after/np.linalg.norm(wave_step_after)
         k += 1
-    return(wave_evol)
+    return wave_evol 
 
 # Implementing Platen scheme. Section 7.2.5 of "Theory of Open Quantum Systems". 
 # Bruer and Petruccione
@@ -438,7 +438,7 @@ def simulate_sse_platen(init_state, hamiltonian, lindblad, hbar, time_step, no_t
         wave_step_after = np.asarray(wave_step_after).reshape(-1)
         wave_evol[:, k] = wave_step_after/np.linalg.norm(wave_step_after)
         k += 1
-    return(wave_evol)
+    return wave_evol
 
 # Define a function to compute an operator time-average with standard error
 def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, time_step, no_time_steps, no_of_realisations, method):
@@ -504,7 +504,12 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
         standard_error = np.sqrt(standard_error)
     else:
         standard_error = np.zeros(no_time_steps, dtype = float)
-    return time, average, standard_error
+    
+    ### To be able to keep the wavefunction as well just in case
+    if no_of_realisations == 1:
+        return time, average, standard_error, wave_evol
+    else:
+        return time, average, standard_error
 
 ### Convergence function requires more work and bullet proofing. Unclear as to
 ### which eigenstate convergence to choose. FIX ME.
@@ -605,7 +610,7 @@ def convergence_function(V1, V2, hbar, T, mass, omega, time_step):
         error_time_iter_array.append(error_time_iter)
         eigval_of_int_array.append(eigval_of_int)
         prob_array.append(prob_of_last_state)
-    return(dim, omega, dim_array, error_time_iter_array, eigval_of_int_array, prob_array)
+    return dim, omega, dim_array, error_time_iter_array, eigval_of_int_array, prob_array
 
 # Defining Lindblad drift based on Liouville equation
 
@@ -620,7 +625,7 @@ def lindblad_drift(rho, hamiltonian, lindblad, hbar):
     drift = - 1j/hbar * (hamiltonian * rho - rho * hamiltonian) + \
            lindblad * rho * lindblad.getH() - 0.5 * rho * lindblad.getH() * lindblad - \
            0.5 * lindblad.getH() * lindblad * rho
-    return(drift)
+    return drift
 
 ### Integrating Lindblad directly
 
@@ -641,7 +646,7 @@ def int_lindblad_liouv_euler(init_state, hamiltonian, lindblad, hbar, time_step,
     for i in range(0, no_steps - 1):
         rho_evol[:, :, i+1] = rho_evol[:, :, i] + lindblad_drift(rho_evol[:, :, i], hamiltonian, lindblad, hbar) * time_step
         rho_evol[:, :, i+1] = rho_evol[:, :, i+1] / trace_matrix(rho_evol[:, :, i+1])
-    return(rho_evol)
+    return rho_evol
 
 ### Obtaining the expectation value of operator in time by using Euler scheme to integrate Lindblad equation
 
@@ -669,7 +674,7 @@ def tr_rho_operator_euler(init_rho, operator, hamiltonian, lindblad, hbar, time_
         tr_rho_operator[i] = trace_matrix(operator * rho_evol1)
         if abs(trace_matrix(rho_evol1)) > 2 or abs(trace_matrix(operator * rho_evol1)) > 2:
             break
-    return(tr_rho_operator)
+    return tr_rho_operator
 
 
 def exp_op_lindblad_superoperator(init_rho, operator, hamiltonian, lindblad, hbar, time_step, no_steps):
@@ -700,7 +705,7 @@ def exp_op_lindblad_superoperator(init_rho, operator, hamiltonian, lindblad, hba
         rho_evol_liouv = np.reshape(rho_evol_ham, dim * dim, order = 'C').T
         if abs(trace_matrix(rho_evol_ham)) > 2 or abs(trace_matrix(operator * rho_evol_ham)) > 2:
             break
-    return(tr_rho_operator)
+    return tr_rho_operator
 
 
 def rho_lindblad_superoperator(init_rho, hamiltonian, lindblad, hbar, time_step, no_steps):
@@ -730,64 +735,4 @@ def rho_lindblad_superoperator(init_rho, hamiltonian, lindblad, hbar, time_step,
         rho_evol_liouv = np.reshape(rho_evol_ham, dim * dim, order = 'C').T
         if abs(trace_matrix(rho_evol_ham)) > 2:
             break
-    return(rho_operator)
-
-#### Obtaining the expectation value of operator in time by using RK scheme to integrate Lindblad equation
-##### DOES NOT WORK!
-#
-#def tr_rho_operator_rk(init_rho, operator, hamiltonian, lindblad, hbar, time_step, no_steps):
-#    '''Arguments:
-#        init_rho - NxN matrix defining initial state.
-#        operator - NxN matrix, whose expectation value we are interested in
-#        hamiltonian - NxN matrix defining the Hamiltonian of the system for the Lindblad equation
-#        lindblad - NxN matrix defining the Lindblad operator for Lindblad equation.
-#        hbar - as float
-#        time_step - as float. The time step used in the numerical scheme.
-#        no_steps - as integer. The amount of time steps to propagate through.
-#      Returns:
-#        The expectation value of operator changing in time as an array.'''
-#    tr_rho_operator = np.empty(no_steps, dtype = complex)
-#    # Setting initial value
-#    rho_evol0 = init_rho / trace_matrix(init_rho)
-#    # RK 1
-#    rho_evol1 = lindblad_drift(rho_evol0, hamiltonian, lindblad, hbar)
-#    rho_evol1 = rho_evol1 / trace_matrix(rho_evol1)
-#    # RK 2
-#    rho_evol2 = lindblad_drift(rho_evol0 + 0.5 * time_step * rho_evol1, hamiltonian, lindblad, hbar)
-#    rho_evol2 = rho_evol2 / trace_matrix(rho_evol2)
-#    # RK 3
-#    rho_evol3 = lindblad_drift(rho_evol0 + 0.5 * time_step * rho_evol2, hamiltonian, lindblad, hbar)
-#    rho_evol3 = rho_evol3 / trace_matrix(rho_evol3)
-#    # RK 4
-#    rho_evol4 = lindblad_drift(rho_evol0 + time_step * rho_evol3, hamiltonian, lindblad, hbar)
-#    rho_evol4 = rho_evol4 / trace_matrix(rho_evol4)
-#    # Putting it all together
-#    rho_evol5 = rho_evol0 + 1/6 * (rho_evol1 + 2 * rho_evol2 + 2 * rho_evol3 + rho_evol4) * time_step
-#    rho_evol5 = rho_evol5 / trace_matrix(rho_evol5)
-#    tr_rho_operator[0] = trace_matrix(operator * rho_evol0)
-#    tr_rho_operator[1] = trace_matrix(operator * rho_evol5)
-#    for i in range(2, no_steps):
-#        rho_evol0 = rho_evol5
-#        # RK 1
-#        rho_evol1 = lindblad_drift(rho_evol0, hamiltonian, lindblad, hbar)
-#        rho_evol1 = rho_evol1 / trace_matrix(rho_evol1)
-#        # RK 2
-#        rho_evol2 = lindblad_drift(rho_evol0 + 0.5 * time_step * rho_evol1, hamiltonian, lindblad, hbar)
-#        rho_evol2 = rho_evol2 / trace_matrix(rho_evol2)
-#        # RK 3
-#        rho_evol3 = lindblad_drift(rho_evol0 + 0.5 * time_step * rho_evol2, hamiltonian, lindblad, hbar)
-#        rho_evol3 = rho_evol3 / trace_matrix(rho_evol3)
-#        # RK 4
-#        rho_evol4 = lindblad_drift(rho_evol0 + time_step * rho_evol3, hamiltonian, lindblad, hbar)
-#        rho_evol4 = rho_evol4 / trace_matrix(rho_evol4)
-#        # Putting it all together
-#        rho_evol5 = rho_evol0 + 1/6 * (rho_evol1 + 2 * rho_evol2 + 2 * rho_evol3 + rho_evol4) * time_step
-#        rho_evol5 = rho_evol5 / trace_matrix(rho_evol5)
-#        
-#        # Saving trace value
-#        tr_rho_operator[i] = trace_matrix(operator * rho_evol5)
-#        
-#        # Break to save comp time on checking
-#        if abs(trace_matrix(rho_evol1)) > 2 or abs(trace_matrix(operator * rho_evol5)) > 2:
-#            break
-#    return(tr_rho_operator)
+    return rho_operator
