@@ -4,4 +4,4 @@
 #PBS -q standard
 
 cd /home/ma/k/kk2714/Masters_Project/Python
-python cluster_test.py > results.out
+python cluster_test_advanced.py > results.out
