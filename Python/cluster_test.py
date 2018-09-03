@@ -438,7 +438,6 @@ def simulate_sse_platen(init_state, hamiltonian, lindblad, hbar, time_step, no_t
     return(wave_evol)
 
 # Define a function to compute an operator time-average with standard error
-(parallel=True)
 def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, time_step, no_time_steps, no_of_realisations, method):
     '''Function computes the time evolution of an operator by averaging over a given number of
     realisations of individual solutions of the stochastic Schrodinger equation with a specified
