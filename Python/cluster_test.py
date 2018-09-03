@@ -6,14 +6,7 @@ Created on Tue Jul 31 17:52:05 2018
 """
 from quantum_functions_library import *
 import matplotlib.pyplot as plt
-import time as time_clock
 import numpy as np
-import sys, os
-import scipy.io
-
-### For clearing up any file paths
-dir_path = os.path.dirname(os.path.realpath(__file__))
-os.chdir(dir_path)
 
 # Parameters of model
     
@@ -47,8 +40,6 @@ h_sys = 1/(2 * mass) * p_operator * p_operator + V2 * x_operator * x_operator * 
 
 hamiltonian = h_sys + gamma/2 * (x_operator * p_operator + p_operator * x_operator)
 
-# No temperature
-time = np.arange(0, no_time_steps * time_step, time_step, dtype = float)
 #unseeding code in a cheeky way
 np.random.seed(int(time_clock.time()))
 results = operator_time_average(init_state, hamiltonian, lindblad, x_operator, hbar, time_step, no_time_steps, 1, "rk")
@@ -57,21 +48,9 @@ init_state_str = 'coherent_state_' + 'q' + str(q_init).replace(".", "") + 'p_ini
 
 ##### Save all of the data
 data_output_path = './Data/qm_sse_simulation_ind_path_' + init_state_str + \
-                   '_t' + str(T).replace(".", "") + '_g' + str(gamma).replace(".", "") + '.mat'
+                   '_t' + str(T).replace(".", "") + '_g' + str(gamma).replace(".", "") + '.npy'
 
-scipy.io.savemat(data_output_path, 
-                 mdict={'time_array': time,
-                        'init_state': init_state,
-                        'x_operator_expectation': results[0],
-                        'x_operator_expectation_error': results[1],
-                        }, 
-                 oned_as='row')
-matdata = scipy.io.loadmat(data_output_path)
-assert np.all(time == matdata['time_array'])
-assert np.all(results[0] == matdata['x_operator_expectation'])
-assert np.all(results[1] == matdata['x_operator_expectation_error'])
-
-#### ADDING TEMPERATURE TO THE SYSTEM
+np.save(data_output_path, results)
 
 # Figure 3.1
 gamma = 0.1
@@ -89,7 +68,6 @@ p_operator = 1j * np.sqrt(hbar * mass * omega / 2) * (raising_operator(dim) - lo
 lindblad = np.sqrt(2 * mass * kb * T) / hbar * x_operator + 1j / (2 * np.sqrt(2 * mass * kb * T)) * p_operator
 h_sys = 1/(2 * mass) * p_operator * p_operator + V2 * x_operator * x_operator * x_operator * x_operator - V1 * x_operator * x_operator
 hamiltonian = h_sys + gamma/2 * (x_operator * p_operator + p_operator * x_operator)
-time = np.arange(0, no_time_steps * time_step, time_step, dtype = float)
 #unseeding code in a cheeky way
 np.random.seed(int(time_clock.time()))
 results = operator_time_average(init_state, hamiltonian, lindblad, x_operator, hbar, time_step, no_time_steps, 1, "rk")
@@ -97,16 +75,6 @@ init_state_str = 'coherent_state_' + 'q' + str(q_init).replace(".", "") + 'p_ini
 
 ##### Save all of the data
 data_output_path = './Data/qm_sse_simulation_ind_path_' + init_state_str + \
-                   '_t' + str(T).replace(".", "") + '_g' + str(gamma).replace(".", "") + '.mat'
+                   '_t' + str(T).replace(".", "") + '_g' + str(gamma).replace(".", "") + '.npy'
 
-scipy.io.savemat(data_output_path, 
-                 mdict={'time_array': time,
-                        'init_state': init_state,
-                        'x_operator_expectation': results[0],
-                        'x_operator_expectation_error': results[1],
-                        }, 
-                 oned_as='row')
-matdata = scipy.io.loadmat(data_output_path)
-assert np.all(time == matdata['time_array'])
-assert np.all(results[0] == matdata['x_operator_expectation'])
-assert np.all(results[1] == matdata['x_operator_expectation_error'])
+np.save(data_output_path, results)

@@ -464,6 +464,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
         The average over realisation for the time-dependent operator. Additionally returns the standard
         error on the result as a matrix'''
     results = np.zeros((no_time_steps, no_of_realisations), dtype = float)
+    time = np.arange(0, no_time_steps * time_step, time_step, dtype = float)
     if method not in ("euler", "rk", "heun", "platen"):
         raise ValueError("Unknown numerical scheme. Please read function specification.")    
     # Euler method
@@ -507,7 +508,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
         standard_error = np.sqrt(standard_error)
     else:
         standard_error = np.zeros(no_time_steps, dtype = float)
-    return(average, standard_error)
+    return time, average, standard_error
 
 ### Convergence function requires more work and bullet proofing. Unclear as to
 ### which eigenstate convergence to choose. FIX ME.
