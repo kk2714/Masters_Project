@@ -18,7 +18,7 @@ hbar = 1/(8.575*10 **(-34)/ (1.0545718 * 10**(-34)))
 kb = 1
 omega = 1
 time_step = 0.001
-no_time_steps = 500000
+no_time_steps = 50
 dim = 80
 
 #### Defining operators that will remain fixed
