@@ -461,12 +461,14 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
         error on the result as a matrix'''
     results = np.zeros((no_time_steps, no_of_realisations), dtype = float)
     time = np.arange(0, no_time_steps * time_step, time_step, dtype = float)
+    wave_evol_matrix = np.zeros((init_state.shape[0], len(time), no_of_realisations), dtype = complex)
     if method not in ("euler", "rk", "heun", "platen"):
         raise ValueError("Unknown numerical scheme. Please read function specification.")    
     # Euler method
     if method == "euler":
         for j in range(no_of_realisations):
             wave_evol = simulate_sse_euler(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps)
+            wave_evol_matrix[:, :, j] = wave_evol
             for k in range(wave_evol.shape[1]):
                 wave_func = np.matrix(wave_evol[:, k], dtype = complex).T
                 results[k, j] += expectation(operator, wave_func)
@@ -474,6 +476,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
     if method == "heun":
         for j in range(no_of_realisations):
             wave_evol = simulate_sse_heun(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps)
+            wave_evol_matrix[:, :, j] = wave_evol
             for k in range(wave_evol.shape[1]):
                 wave_func = np.matrix(wave_evol[:, k], dtype = complex).T
                 results[k, j] += expectation(operator, wave_func)
@@ -481,6 +484,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
     if method == "rk":
         for j in range(no_of_realisations):
             wave_evol = simulate_sse_rk(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps)
+            wave_evol_matrix[:, :, j] = wave_evol
             for k in range(wave_evol.shape[1]):
                 wave_func = np.matrix(wave_evol[:, k], dtype = complex).T
                 results[k, j] += expectation(operator, wave_func)
@@ -488,6 +492,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
     if method == "platen":
         for j in range(no_of_realisations):
             wave_evol = simulate_sse_platen(init_state, hamiltonian, lindblad, hbar, time_step, no_time_steps)
+            wave_evol_matrix[:, :, j] = wave_evol
             for k in range(wave_evol.shape[1]):
                 wave_func = np.matrix(wave_evol[:, k], dtype = complex).T
                 results[k, j] += expectation(operator, wave_func)
@@ -506,10 +511,7 @@ def operator_time_average(init_state, hamiltonian, lindblad, operator, hbar, tim
         standard_error = np.zeros(no_time_steps, dtype = float)
     
     ### To be able to keep the wavefunction as well just in case
-    if no_of_realisations == 1:
-        return time, average, standard_error, wave_evol
-    else:
-        return time, average, standard_error
+    return time, average, standard_error, wave_evol_matrix
 
 ### Convergence function requires more work and bullet proofing. Unclear as to
 ### which eigenstate convergence to choose. FIX ME.
