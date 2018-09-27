@@ -17,7 +17,7 @@ Quantum:
 - solving stochastic Schrodinger equation corresponding to the Caldeira-Leggett model in Lindblad form using
   four schemes:
 	- Euler,
-	- Leapfrog method,
+	- Heun,
 	- Runge-Kutta,
 	- Platen.
 - solving Liouville equation for the density matrix resulting from the Caldeira-Leggett model in Lindblad
