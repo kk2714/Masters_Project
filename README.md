@@ -2,7 +2,7 @@
 
 The Github Repository contains methods for solving the movement of a classical and quantum particle
 in a 1-dimensional two state energy potential at finite temperatures. The mathematical techniques 
-along with their numerical simulation, where implemented in the classical and quantum functions libraries. 
+along with their numerical simulation were implemented in the classical and quantum functions libraries. 
 
 The libraries contain functions to solve:
 
@@ -24,4 +24,5 @@ Quantum:
   form using superoperators.
 - computing new proposed quantum transition rates.
 
-The documentation of mathematical formulation can be found in the Mathematics folder in the pdf file.
+The documentation of mathematical formulation can be found in the Mathematics folder in the pdf file. Please refer
+to it for further explanation.
